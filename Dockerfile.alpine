@@ -1,7 +1,7 @@
 ARG HOST_ARCH=x86_64
 ARG TARGET_TRIPLE=aarch64-linux-musl
 
-FROM muslcc/$HOST_ARCH:$TARGET_TRIPLE
+FROM muslcc/$HOST_ARCH:$TARGET_TRIPLE AS build
 
 ARG PKG_FETCH_OPTION_a
 ARG PKG_FETCH_OPTION_n
@@ -11,7 +11,14 @@ USER root:root
 
 WORKDIR /root/pkg-fetch/
 
-RUN apk add --no-cache build-base git linux-headers npm python2 python3 yarn
+# HAXX upgrade alpine here because the muslcc image
+# is built on an old image and no newer version is available
+RUN sed -i -e 's/v3\.14/v3\.20/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --upgrade apk-tools && \
+    apk upgrade --available
+
+RUN apk add --no-cache build-base git linux-headers npm python3 yarn
 
 # https://gitlab.alpinelinux.org/alpine/aports/-/issues/8626
 ENV CFLAGS=-U_FORTIFY_SOURCE
@@ -34,6 +41,9 @@ ENV READELF_host=/usr/bin/readelf
 
 COPY . ./
 
-RUN yarn install
+RUN yarn install --ignore-engines
 
 RUN yarn start --force-build --arch $PKG_FETCH_OPTION_a --node-range $PKG_FETCH_OPTION_n --platform $PKG_FETCH_OPTION_p --output dist
+
+FROM scratch
+COPY --from=build /root/pkg-fetch/dist /

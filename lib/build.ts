@@ -63,8 +63,11 @@ function getConfigureArgs(major: number, targetPlatform: string): string[] {
   // No ICU
   args.push('--without-intl');
 
-
   args.push('--without-corepack');
+
+  // New node v22
+  args.push('--without-amaro');
+  args.push('--without-sqlite');
 
 
   // Workaround for nodejs/node#39313
@@ -203,8 +206,8 @@ async function compileOnUnix(
   process.env.CXXFLAGS = `${CXXFLAGS} -Os`;
 
   if (targetArch === 'armv7') {
-    process.env.CFLAGS = `${process.env.CFLAGS} -marm -mcpu=cortex-a7`;
-    process.env.CXXFLAGS = `${process.env.CXXFLAGS} -marm -mcpu=cortex-a7`;
+    process.env.CFLAGS = `${process.env.CFLAGS} -marm -mcpu=cortex-a7 -mfpu=vfpv3`;
+    process.env.CXXFLAGS = `${process.env.CXXFLAGS} -marm -mcpu=cortex-a7 -mfpu=vfpv3`;
 
     args.push('--with-arm-float-abi=hard');
     args.push('--with-arm-fpu=vfpv3');

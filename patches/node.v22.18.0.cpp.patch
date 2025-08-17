@@ -1,0 +1,2554 @@
+diff --git a/common.gypi b/common.gypi
+index 20135003dd0..547ebb1e66a 100644
+--- a/common.gypi
++++ b/common.gypi
+@@ -192,11 +192,11 @@
+             ['clang==1', {
+               'lto': ' -flto ', # Clang
+             }, {
+-              'lto': ' -flto=4 -fuse-linker-plugin -ffat-lto-objects ', # GCC
++              'lto': ' -flto=4 -ffat-lto-objects ', # GCC
+             }],
+           ],
+         },
+-        'cflags': [ '-O3' ],
++        'cflags': [ '-Os' ],
+         'conditions': [
+           ['enable_lto=="true"', {
+             'cflags': ['<(lto)'],
+diff --git a/deps/llhttp/common.gypi b/deps/llhttp/common.gypi
+index ef7549f809d..0bf64bafae5 100644
+--- a/deps/llhttp/common.gypi
++++ b/deps/llhttp/common.gypi
+@@ -15,7 +15,7 @@
+       },
+       'Release': {
+         'defines': [ 'NDEBUG' ],
+-        'cflags': [ '-Wall', '-Wextra', '-O3' ],
++        'cflags': [ '-Wall', '-Wextra', '-Os' ],
+         'msvs_settings': {
+           'VCCLCompilerTool': {
+             'RuntimeLibrary': 0, # static release
+diff --git a/deps/ngtcp2/nghttp3/lib/nghttp3_ringbuf.c b/deps/ngtcp2/nghttp3/lib/nghttp3_ringbuf.c
+index 7d3ab39bf82..67a48dee53a 100644
+--- a/deps/ngtcp2/nghttp3/lib/nghttp3_ringbuf.c
++++ b/deps/ngtcp2/nghttp3/lib/nghttp3_ringbuf.c
+@@ -34,10 +34,7 @@
+ #include "nghttp3_macro.h"
+ 
+ static int ispow2(size_t n) {
+-#if defined(_MSC_VER) && !defined(__clang__) &&                                \
+-  (defined(_M_ARM) || (defined(_M_ARM64) && _MSC_VER < 1941))
+-  return n && !(n & (n - 1));
+-#elif defined(WIN32)
++#if defined(WIN32)
+   return 1 == __popcnt((unsigned int)n);
+ #else  /* !((defined(_MSC_VER) && !defined(__clang__) && (defined(_M_ARM) ||   \
+           (defined(_M_ARM64) && _MSC_VER < 1941))) || defined(WIN32)) */
+diff --git a/deps/ngtcp2/ngtcp2/lib/ngtcp2_ringbuf.c b/deps/ngtcp2/ngtcp2/lib/ngtcp2_ringbuf.c
+index 353afca4d48..dea944aed5a 100644
+--- a/deps/ngtcp2/ngtcp2/lib/ngtcp2_ringbuf.c
++++ b/deps/ngtcp2/ngtcp2/lib/ngtcp2_ringbuf.c
+@@ -33,10 +33,7 @@
+ 
+ #ifndef NDEBUG
+ static int ispow2(size_t n) {
+-#  if defined(_MSC_VER) && !defined(__clang__) &&                              \
+-    (defined(_M_ARM) || (defined(_M_ARM64) && _MSC_VER < 1941))
+-  return n && !(n & (n - 1));
+-#  elif defined(WIN32)
++#if defined(WIN32)
+   return 1 == __popcnt((unsigned int)n);
+ #  else  /* !((defined(_MSC_VER) && !defined(__clang__) && (defined(_M_ARM) || \
+             (defined(_M_ARM64) && _MSC_VER < 1941))) || defined(WIN32)) */
+diff --git a/deps/openssl/config/archs/BSD-x86/asm/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86/asm/openssl-cl.gypi
+index 4380305593a..a12e07190b4 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm/openssl-cl.gypi
+@@ -28,9 +28,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/asm/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86/asm/openssl-fips.gypi
+index f900bbeb914..cbcba31d1bf 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm/openssl-fips.gypi
+@@ -324,9 +324,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/asm/openssl.gypi b/deps/openssl/config/archs/BSD-x86/asm/openssl.gypi
+index dbe90343117..7aa50b0d293 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-cl.gypi
+index dc324536e46..6a92f3827d0 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-cl.gypi
+@@ -28,9 +28,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-fips.gypi
+index f9448e07fd9..40fee9da886 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl-fips.gypi
+@@ -324,9 +324,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl.gypi b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl.gypi
+index 7d73b1d0fed..ab0523fe118 100644
+--- a/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/asm_avx2/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_BSD-x86': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86/no-asm/openssl-cl.gypi
+index 8fd73693174..a093a44c258 100644
+--- a/deps/openssl/config/archs/BSD-x86/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_BSD-x86': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86/no-asm/openssl-fips.gypi
+index 4d4d25a9e8f..1b0715a7d6f 100644
+--- a/deps/openssl/config/archs/BSD-x86/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_BSD-x86': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86/no-asm/openssl.gypi b/deps/openssl/config/archs/BSD-x86/no-asm/openssl.gypi
+index 2031f41d630..887344139c2 100644
+--- a/deps/openssl/config/archs/BSD-x86/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_BSD-x86': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_BSD-x86': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86_64/asm/openssl-cl.gypi
+index bfe296a44f6..8296e4f8bbd 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86_64/asm/openssl-fips.gypi
+index e98affa3c77..b1fa9ae3ec2 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm/openssl-fips.gypi
+@@ -338,9 +338,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm/openssl.gypi b/deps/openssl/config/archs/BSD-x86_64/asm/openssl.gypi
+index f64b1e5b3bf..2c83635c214 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-cl.gypi
+index 108012655aa..eadb43511c0 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-fips.gypi
+index 2831a837c2a..5e34e49c7bc 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl-fips.gypi
+@@ -338,9 +338,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl.gypi b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl.gypi
+index 9dc83c8bbb1..cc7c7d77d7f 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/asm_avx2/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_BSD-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-cl.gypi
+index b26fb2a5e1c..b0226210575 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_BSD-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-fips.gypi
+index e1b0a3a63de..d305279726e 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_BSD-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl.gypi b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl.gypi
+index bb080a96ff6..1d346107c83 100644
+--- a/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/BSD-x86_64/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_BSD-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_BSD-x86_64': [
+       '-pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-aarch64/asm/openssl-cl.gypi
+index 5a6d4b8257f..1abb3f24873 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm/openssl-cl.gypi
+@@ -17,9 +17,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-aarch64/asm/openssl-fips.gypi
+index 6cbbcf0e5a9..53b33b51909 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm/openssl-fips.gypi
+@@ -313,9 +313,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm/openssl.gypi b/deps/openssl/config/archs/linux-aarch64/asm/openssl.gypi
+index 4e0923be89c..5037b936917 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm/openssl.gypi
+@@ -990,9 +990,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-cl.gypi
+index 3baf4348167..20ac41b1b11 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-cl.gypi
+@@ -17,9 +17,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-fips.gypi
+index 35653fd9e7a..fef8951f570 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl-fips.gypi
+@@ -313,9 +313,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl.gypi
+index b9d76aee0d0..c5a0bd38557 100644
+--- a/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/asm_avx2/openssl.gypi
+@@ -990,9 +990,9 @@
+     ],
+     'openssl_cflags_linux-aarch64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-cl.gypi
+index b1b8cb0ae86..4eaf8916e47 100644
+--- a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-aarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-fips.gypi
+index 3f8a43dccf7..22c8b6b7dfc 100644
+--- a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux-aarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl.gypi b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl.gypi
+index 387362a4757..30a76e1bbe5 100644
+--- a/deps/openssl/config/archs/linux-aarch64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-aarch64/no-asm/openssl.gypi
+@@ -968,9 +968,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-aarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-aarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-armv4/asm/openssl-cl.gypi
+index 0b29d69ac52..f6b3504c3fc 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm/openssl-cl.gypi
+@@ -20,9 +20,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-armv4/asm/openssl-fips.gypi
+index 98918f2400b..1aed1e3df01 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm/openssl-fips.gypi
+@@ -317,9 +317,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm/openssl.gypi b/deps/openssl/config/archs/linux-armv4/asm/openssl.gypi
+index 849f58d4bdb..5f1c0320efa 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm/openssl.gypi
+@@ -994,9 +994,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-cl.gypi
+index 34e8366d427..7c9101b993e 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-cl.gypi
+@@ -20,9 +20,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-fips.gypi
+index 6a72c2a7f4b..dc6744f6a34 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl-fips.gypi
+@@ -317,9 +317,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl.gypi
+index 76181e218d8..36a01eed694 100644
+--- a/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/asm_avx2/openssl.gypi
+@@ -994,9 +994,9 @@
+     ],
+     'openssl_cflags_linux-armv4': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-armv4/no-asm/openssl-cl.gypi
+index b683cb33db9..b7382d2326b 100644
+--- a/deps/openssl/config/archs/linux-armv4/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-armv4': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-armv4/no-asm/openssl-fips.gypi
+index 1c35efba756..34e9784ca87 100644
+--- a/deps/openssl/config/archs/linux-armv4/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-armv4/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux-armv4': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-armv4/no-asm/openssl.gypi b/deps/openssl/config/archs/linux-armv4/no-asm/openssl.gypi
+index 6ad73f4142d..51725a87be7 100644
+--- a/deps/openssl/config/archs/linux-armv4/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-armv4/no-asm/openssl.gypi
+@@ -968,9 +968,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-armv4': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-armv4': [
+       '-ldl -pthread -latomic',
+diff --git a/deps/openssl/config/archs/linux-elf/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-elf/asm/openssl-cl.gypi
+index 8f021d5c212..9458e9ddcfa 100644
+--- a/deps/openssl/config/archs/linux-elf/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-elf/asm/openssl-fips.gypi
+index dc143262761..6e39020b925 100644
+--- a/deps/openssl/config/archs/linux-elf/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm/openssl-fips.gypi
+@@ -325,9 +325,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/asm/openssl.gypi b/deps/openssl/config/archs/linux-elf/asm/openssl.gypi
+index c782453da24..aefa258fff2 100644
+--- a/deps/openssl/config/archs/linux-elf/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-cl.gypi
+index 4e2c60206e2..f98708b8f9d 100644
+--- a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-fips.gypi
+index d54f3553593..6b69062eb2f 100644
+--- a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl-fips.gypi
+@@ -325,9 +325,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl.gypi
+index a0ce9ab8dca..7e24a15f550 100644
+--- a/deps/openssl/config/archs/linux-elf/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux-elf/asm_avx2/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_linux-elf': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-elf/no-asm/openssl-cl.gypi
+index b3c9034bbf2..b1a7e94d021 100644
+--- a/deps/openssl/config/archs/linux-elf/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-elf/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-elf': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-elf/no-asm/openssl-fips.gypi
+index b82762a2a4e..46410723f92 100644
+--- a/deps/openssl/config/archs/linux-elf/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-elf/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux-elf': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-elf/no-asm/openssl.gypi b/deps/openssl/config/archs/linux-elf/no-asm/openssl.gypi
+index 8bc730460cf..fd94406d470 100644
+--- a/deps/openssl/config/archs/linux-elf/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-elf/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-elf': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_linux-elf': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-ppc64le/asm/openssl-cl.gypi
+index 1bad8297c59..37de6ad7665 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm/openssl-cl.gypi
+@@ -20,9 +20,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-ppc64le/asm/openssl-fips.gypi
+index 7880353436c..c12e067dc05 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm/openssl-fips.gypi
+@@ -323,9 +323,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm/openssl.gypi b/deps/openssl/config/archs/linux-ppc64le/asm/openssl.gypi
+index 391c727e3ca..031f48d4eea 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-cl.gypi
+index 2ee1437bd1d..3da111833cd 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-cl.gypi
+@@ -20,9 +20,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-fips.gypi
+index 97e9aed93d8..49f9d5e50ed 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl-fips.gypi
+@@ -323,9 +323,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl.gypi
+index df4018f9641..84f985ec509 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/asm_avx2/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_linux-ppc64le': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-cl.gypi
+index d2f52ad8943..80e0d8f1bcf 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-ppc64le': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-fips.gypi
+index 8e3fcb8b75a..c6e916d8071 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux-ppc64le': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl.gypi b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl.gypi
+index 59a593c03ce..b1450514125 100644
+--- a/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-ppc64le/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-ppc64le': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-ppc64le': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-x86_64/asm/openssl-cl.gypi
+index cae54ea4392..f8ef4010489 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm/openssl-cl.gypi
+@@ -30,9 +30,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-x86_64/asm/openssl-fips.gypi
+index 55e1e664a79..a301f959b1f 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm/openssl-fips.gypi
+@@ -339,9 +339,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm/openssl.gypi b/deps/openssl/config/archs/linux-x86_64/asm/openssl.gypi
+index a2861e7edd1..6ae130cc547 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-cl.gypi
+index e6e8d9052b1..a193240a699 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-cl.gypi
+@@ -30,9 +30,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-fips.gypi
+index cad5b27e655..2ba8029d6be 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl-fips.gypi
+@@ -339,9 +339,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl.gypi
+index 5be120b7db1..e64e69e7ffc 100644
+--- a/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/asm_avx2/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_linux-x86_64': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-cl.gypi
+index a8210a81a97..879a8ac16e6 100644
+--- a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-fips.gypi
+index c7b6bbbec68..e1ca64234c1 100644
+--- a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl.gypi b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl.gypi
+index 0eae103bf39..c40f1938d47 100644
+--- a/deps/openssl/config/archs/linux-x86_64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux-x86_64/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux-x86_64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux-x86_64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux32-s390x/asm/openssl-cl.gypi
+index 0333449e35d..114308daa47 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm/openssl-cl.gypi
+@@ -23,9 +23,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux32-s390x/asm/openssl-fips.gypi
+index 1ea8f67823a..fb5b72253d1 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm/openssl-fips.gypi
+@@ -316,9 +316,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm/openssl.gypi b/deps/openssl/config/archs/linux32-s390x/asm/openssl.gypi
+index d2ec66abc20..5c75dd81ebe 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm/openssl.gypi
+@@ -993,9 +993,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-cl.gypi
+index ea32a6d1e63..e7873d26ee0 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-cl.gypi
+@@ -23,9 +23,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-fips.gypi
+index acc4e71742e..a3ca08c8797 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl-fips.gypi
+@@ -316,9 +316,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl.gypi
+index 9a9cb1df312..2f338259c70 100644
+--- a/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/asm_avx2/openssl.gypi
+@@ -993,9 +993,9 @@
+     ],
+     'openssl_cflags_linux32-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-cl.gypi
+index 34ece56b4c1..bf46ec7ae3e 100644
+--- a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux32-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-fips.gypi
+index 63cfc208b50..be4b0122fe0 100644
+--- a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux32-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl.gypi b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl.gypi
+index 7dc0d96b51c..b9090c4fac7 100644
+--- a/deps/openssl/config/archs/linux32-s390x/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux32-s390x/no-asm/openssl.gypi
+@@ -970,9 +970,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux32-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m31 -Wa,-mzarch',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux32-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-cl.gypi
+index 51e2155c666..60638e52ae2 100644
+--- a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-loongarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-loongarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-fips.gypi
+index 97b6d28086e..e4ef23eea9a 100644
+--- a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux64-loongarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-loongarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl.gypi b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl.gypi
+index 530fb2b9972..4ce85fc0518 100644
+--- a/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-loongarch64/no-asm/openssl.gypi
+@@ -968,9 +968,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-loongarch64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-loongarch64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-mips64/asm/openssl-cl.gypi
+index 263cf3c2e00..b839561192e 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm/openssl-cl.gypi
+@@ -15,9 +15,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-mips64/asm/openssl-fips.gypi
+index c7660305e29..b4e22c0e274 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm/openssl-fips.gypi
+@@ -303,9 +303,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm/openssl.gypi b/deps/openssl/config/archs/linux64-mips64/asm/openssl.gypi
+index 2766034c0f4..541dde44f5a 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm/openssl.gypi
+@@ -981,9 +981,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-cl.gypi
+index b64cb827aad..82e82b45f62 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-cl.gypi
+@@ -15,9 +15,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-fips.gypi
+index e4a55e998a6..a3ba3e1474e 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl-fips.gypi
+@@ -303,9 +303,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl.gypi
+index 94f3c87ec84..7f2f72ef704 100644
+--- a/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/asm_avx2/openssl.gypi
+@@ -981,9 +981,9 @@
+     'openssl_cflags_linux64-mips64': [
+       '-mips3',
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-cl.gypi
+index 27d1c9f1510..4a0c9d1e705 100644
+--- a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-mips64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-fips.gypi
+index a6178f1c65a..1469fba3f23 100644
+--- a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux64-mips64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl.gypi b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl.gypi
+index d668c560816..f81814f92d2 100644
+--- a/deps/openssl/config/archs/linux64-mips64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-mips64/no-asm/openssl.gypi
+@@ -968,9 +968,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-mips64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -mabi=64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-mips64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-cl.gypi
+index 529dccf9b4f..3c6616155b8 100644
+--- a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-cl.gypi
+@@ -7,9 +7,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-riscv64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-riscv64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-fips.gypi
+index 0d7994f5f4a..ff7613289c9 100644
+--- a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl-fips.gypi
+@@ -291,9 +291,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux64-riscv64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-riscv64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl.gypi b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl.gypi
+index 28788f4b84b..c7b80d42e8d 100644
+--- a/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-riscv64/no-asm/openssl.gypi
+@@ -968,9 +968,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-riscv64': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-riscv64': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-s390x/asm/openssl-cl.gypi
+index 37cfcb1c40e..ba4975c08e0 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm/openssl-cl.gypi
+@@ -23,9 +23,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-s390x/asm/openssl-fips.gypi
+index 3bcdcbddacd..45b1bb8f00a 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm/openssl-fips.gypi
+@@ -315,9 +315,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm/openssl.gypi b/deps/openssl/config/archs/linux64-s390x/asm/openssl.gypi
+index 3f54c7665d7..02097500ccb 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm/openssl.gypi
+@@ -992,9 +992,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-cl.gypi
+index 0ef49ef3c4e..b2f30af4183 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-cl.gypi
+@@ -23,9 +23,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-fips.gypi
+index 39b31bd756c..ea2837ca66b 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl-fips.gypi
+@@ -315,9 +315,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl.gypi b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl.gypi
+index 2624be71174..e93d25738e5 100644
+--- a/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/asm_avx2/openssl.gypi
+@@ -992,9 +992,9 @@
+     ],
+     'openssl_cflags_linux64-s390x': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-cl.gypi
+index e035c16e4f3..1a63a6c39f0 100644
+--- a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-fips.gypi
+index 0456b3edfab..4f1bf2386cd 100644
+--- a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_linux64-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl.gypi b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl.gypi
+index 1fdc4dfb040..ef63c50e777 100644
+--- a/deps/openssl/config/archs/linux64-s390x/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/linux64-s390x/no-asm/openssl.gypi
+@@ -970,9 +970,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_linux64-s390x': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-pthread -m64',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_linux64-s390x': [
+       '-ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-cl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-cl.gypi
+index 1c53ac3e17c..f76622941e1 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-fips.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-fips.gypi
+index feb230cca13..c38c6fb90df 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl-fips.gypi
+@@ -325,9 +325,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl.gypi
+index 1c98866c3f4..f38cab0396c 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-cl.gypi
+index eb4c8f67d2d..91fe5c828a4 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-cl.gypi
+@@ -29,9 +29,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-fips.gypi
+index e0cbef98e5d..161bc6a75dc 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl-fips.gypi
+@@ -325,9 +325,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl.gypi
+index 675580f4af2..43bf93d052b 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/asm_avx2/openssl.gypi
+@@ -1002,9 +1002,9 @@
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-cl.gypi
+index a2e486b0f94..ac768fb73e2 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-fips.gypi
+index 2ca187efc74..8f8a0f89e3d 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl.gypi b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl.gypi
+index 65b9565d3df..3698e4897be 100644
+--- a/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/solaris-x86-gcc/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_solaris-x86-gcc': [
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+       '-pthread',
+-      '-Wall -O3 -fomit-frame-pointer',
++      '-Wall -Os -fomit-frame-pointer',
+     ],
+     'openssl_ex_libs_solaris-x86-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-cl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-cl.gypi
+index aad5fc68f34..90fed9f066f 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-cl.gypi
+@@ -30,9 +30,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-fips.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-fips.gypi
+index c8295104cf6..af022ef2c40 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl-fips.gypi
+@@ -339,9 +339,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl.gypi
+index d9001667578..c206240e19c 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-cl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-cl.gypi
+index 5e955a3c57c..47bc009e1c4 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-cl.gypi
+@@ -30,9 +30,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-fips.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-fips.gypi
+index 5d26f6e0eb2..9827f6c460f 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl-fips.gypi
+@@ -339,9 +339,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl.gypi
+index d48b3cba951..e63ea55b360 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/asm_avx2/openssl.gypi
+@@ -1016,9 +1016,9 @@
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+       '-Wa,--noexecstack',
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-cl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-cl.gypi
+index 1a39119c069..12fc1449402 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-cl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-cl.gypi
+@@ -8,9 +8,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-fips.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-fips.gypi
+index fc662ceeab7..b05f4e2a53d 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-fips.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl-fips.gypi
+@@ -292,9 +292,9 @@
+       'FIPS_MODULE',
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl.gypi b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl.gypi
+index 44ff54ede30..cad46bea764 100644
+--- a/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl.gypi
++++ b/deps/openssl/config/archs/solaris64-x86_64-gcc/no-asm/openssl.gypi
+@@ -969,9 +969,9 @@
+       'OPENSSL_PIC',
+     ],
+     'openssl_cflags_solaris64-x86_64-gcc': [
+-      '-Wall -O3',
++      '-Wall -Os',
+       '-m64 -pthread',
+-      '-Wall -O3',
++      '-Wall -Os',
+     ],
+     'openssl_ex_libs_solaris64-x86_64-gcc': [
+       '-lsocket -lnsl -ldl -pthread',
+diff --git a/deps/uv/common.gypi b/deps/uv/common.gypi
+index cc9c98e762c..04487b8463f 100644
+--- a/deps/uv/common.gypi
++++ b/deps/uv/common.gypi
+@@ -46,7 +46,7 @@
+       'Release': {
+         'defines': [ 'NDEBUG' ],
+         'cflags': [
+-          '-O3',
++          '-Os',
+         ],
+         'msvs_settings': {
+           'VCCLCompilerTool': {
+diff --git a/deps/v8/include/v8-initialization.h b/deps/v8/include/v8-initialization.h
+index d3e35d6ec5f..6e9bbe38491 100644
+--- a/deps/v8/include/v8-initialization.h
++++ b/deps/v8/include/v8-initialization.h
+@@ -89,6 +89,10 @@ class V8_EXPORT V8 {
+   static void SetFlagsFromCommandLine(int* argc, char** argv,
+                                       bool remove_flags);
+ 
++  static void EnableCompilationForSourcelessUse();
++  static void DisableCompilationForSourcelessUse();
++  static void FixSourcelessScript(Isolate* v8_isolate, Local<UnboundScript> script);
++
+   /** Get the version string. */
+   static const char* GetVersion();
+ 
+diff --git a/deps/v8/src/api/api.cc b/deps/v8/src/api/api.cc
+index 2dd476dda34..8a51f25b572 100644
+--- a/deps/v8/src/api/api.cc
++++ b/deps/v8/src/api/api.cc
+@@ -624,6 +624,28 @@ void V8::SetFlagsFromCommandLine(int* argc, char** argv, bool remove_flags) {
+                                        HelpOptions(HelpOptions::kDontExit));
+ }
+ 
++bool save_lazy;
++bool save_predictable;
++
++void V8::EnableCompilationForSourcelessUse() {
++  save_lazy = i::v8_flags.lazy;
++  i::v8_flags.lazy = false;
++  save_predictable = i::v8_flags.predictable;
++  i::v8_flags.predictable = true;
++}
++
++void V8::DisableCompilationForSourcelessUse() {
++  i::v8_flags.lazy = save_lazy;
++  i::v8_flags.predictable = save_predictable;
++}
++
++void V8::FixSourcelessScript(Isolate* v8_isolate, Local<UnboundScript> unbound_script) {
++  auto isolate = reinterpret_cast<i::Isolate*>(v8_isolate);
++  auto function_info = i::Handle<i::SharedFunctionInfo>::cast(Utils::OpenHandle(*unbound_script));
++  i::Handle<i::Script> script(i::Script::cast(function_info->script()), isolate);
++  script->SetSource(isolate, script,  isolate->factory()->empty_string());
++}
++
+ RegisteredExtension* RegisteredExtension::first_extension_ = nullptr;
+ 
+ RegisteredExtension::RegisteredExtension(std::unique_ptr<Extension> extension)
+diff --git a/deps/v8/src/codegen/compiler.cc b/deps/v8/src/codegen/compiler.cc
+index 9048655363c..ab81c326fc4 100644
+--- a/deps/v8/src/codegen/compiler.cc
++++ b/deps/v8/src/codegen/compiler.cc
+@@ -3634,7 +3634,7 @@ MaybeHandle<SharedFunctionInfo> GetSharedFunctionInfoForScriptImpl(
+     maybe_script = lookup_result.script();
+     maybe_result = lookup_result.toplevel_sfi();
+     is_compiled_scope = lookup_result.is_compiled_scope();
+-    if (!maybe_result.is_null()) {
++    if (!maybe_result.is_null() && source->length()) {
+       compile_timer.set_hit_isolate_cache();
+     } else if (can_consume_code_cache) {
+       compile_timer.set_consuming_code_cache();
+diff --git a/deps/v8/src/compiler/wasm-compiler.cc b/deps/v8/src/compiler/wasm-compiler.cc
+index 16f1f1470b7..4bfeca49e64 100644
+--- a/deps/v8/src/compiler/wasm-compiler.cc
++++ b/deps/v8/src/compiler/wasm-compiler.cc
+@@ -8613,12 +8613,13 @@ wasm::WasmCompilationResult CompileWasmImportCallWrapper(
+                  '-');
+ 
+   auto compile_with_turboshaft = [&]() {
++    wasm::WrapperCompilationInfo info;
++    info.code_kind = CodeKind::WASM_TO_JS_FUNCTION;
++    info.import_info.import_kind = kind;
++    info.import_info.expected_arity = expected_arity;
++    info.import_info.suspend = suspend;
+     return Pipeline::GenerateCodeForWasmNativeStubFromTurboshaft(
+-        env->module, sig,
+-        wasm::WrapperCompilationInfo{
+-            .code_kind = CodeKind::WASM_TO_JS_FUNCTION,
+-            .import_info = {kind, expected_arity, suspend}},
+-        func_name, WasmStubAssemblerOptions(), nullptr);
++        env->module, sig, info, func_name, WasmStubAssemblerOptions(), nullptr);
+   };
+   auto compile_with_turbofan = [&]() {
+     //--------------------------------------------------------------------------
+@@ -8774,13 +8775,15 @@ MaybeHandle<Code> CompileWasmToJSWrapper(Isolate* isolate,
+       base::VectorOf(name_buffer.get(), kMaxNameLen) + kNamePrefixLen, sig);
+ 
+   auto compile_with_turboshaft = [&]() {
++    wasm::WrapperCompilationInfo info;
++    info.code_kind = CodeKind::WASM_TO_JS_FUNCTION;
++    info.import_info.import_kind = kind;
++    info.import_info.expected_arity = expected_arity;
++    info.import_info.suspend = suspend;
+     std::unique_ptr<turboshaft::TurboshaftCompilationJob> job =
+         Pipeline::NewWasmTurboshaftWrapperCompilationJob(
+-            isolate, sig,
+-            wasm::WrapperCompilationInfo{
+-                .code_kind = CodeKind::WASM_TO_JS_FUNCTION,
+-                .import_info = {kind, expected_arity, suspend}},
+-            nullptr, std::move(name_buffer), WasmAssemblerOptions());
++            isolate, sig, info, nullptr, std::move(name_buffer),
++            WasmAssemblerOptions());
+ 
+     // Compile the wrapper
+     if (job->ExecuteJob(isolate->counters()->runtime_call_stats()) ==
+diff --git a/deps/v8/src/heap/marking-visitor-inl.h b/deps/v8/src/heap/marking-visitor-inl.h
+index 39a5bbd22c2..4b860f55d5e 100644
+--- a/deps/v8/src/heap/marking-visitor-inl.h
++++ b/deps/v8/src/heap/marking-visitor-inl.h
+@@ -329,6 +329,13 @@ bool MarkingVisitorBase<ConcreteVisitor>::HasBytecodeArrayForFlushing(
+ template <typename ConcreteVisitor>
+ bool MarkingVisitorBase<ConcreteVisitor>::ShouldFlushCode(
+     Tagged<SharedFunctionInfo> sfi) const {
++  auto script_obj = sfi->script();
++  if (!IsUndefined(script_obj)) {
++    auto script = i::Script::cast(script_obj);
++    if (IsUndefined(script->source())) {
++      return false;
++    }
++  }
+   return IsStressFlushingEnabled(code_flush_mode_) || IsOld(sfi);
+ }
+ 
+diff --git a/deps/v8/src/objects/js-function.cc b/deps/v8/src/objects/js-function.cc
+index 529e283bbf0..c997c53a18c 100644
+--- a/deps/v8/src/objects/js-function.cc
++++ b/deps/v8/src/objects/js-function.cc
+@@ -1308,6 +1308,10 @@ Handle<String> JSFunction::ToString(Handle<JSFunction> function) {
+     Handle<Object> maybe_class_positions = JSReceiver::GetDataProperty(
+         isolate, function, isolate->factory()->class_positions_symbol());
+     if (IsClassPositions(*maybe_class_positions)) {
++      if (IsUndefined(
++              String::cast(Script::cast(shared_info->script())->source()))) {
++        return isolate->factory()->NewStringFromAsciiChecked("class {}");
++      }
+       Tagged<ClassPositions> class_positions =
+           ClassPositions::cast(*maybe_class_positions);
+       int start_position = class_positions->start();
+diff --git a/deps/v8/src/objects/objects.cc b/deps/v8/src/objects/objects.cc
+index 8e013c2544e..7ac03149d86 100644
+--- a/deps/v8/src/objects/objects.cc
++++ b/deps/v8/src/objects/objects.cc
+@@ -4263,7 +4263,12 @@ void Script::InitLineEndsInternal(IsolateT* isolate, Handle<Script> script) {
+ 
+ void Script::SetSource(Isolate* isolate, Handle<Script> script,
+                        Handle<String> source) {
+-  script->set_source(*source);
++  if (source->length() > 0) {
++    script->set_source(*source);
++  } else {
++    Tagged<PrimitiveHeapObject> und = *isolate->factory()->undefined_value();
++    script->set_source(und);
++  }
+   if (isolate->NeedsSourcePositions()) InitLineEnds(isolate, script);
+ }
+ 
+diff --git a/deps/v8/src/parsing/parsing.cc b/deps/v8/src/parsing/parsing.cc
+index f160b27ea4d..748452ba451 100644
+--- a/deps/v8/src/parsing/parsing.cc
++++ b/deps/v8/src/parsing/parsing.cc
+@@ -42,6 +42,7 @@ bool ParseProgram(ParseInfo* info, Handle<Script> script,
+   DCHECK(info->flags().is_toplevel());
+   DCHECK_NULL(info->literal());
+ 
++  if (IsUndefined(String::cast(script->source()))) return false;
+   VMState<PARSER> state(isolate);
+ 
+   // Create a character stream for the parser.
+@@ -74,6 +75,8 @@ bool ParseFunction(ParseInfo* info, Handle<SharedFunctionInfo> shared_info,
+ 
+   // Create a character stream for the parser.
+   Handle<Script> script(Script::cast(shared_info->script()), isolate);
++  if (IsUndefined(String::cast(script->source()))) return false;
++
+   Handle<String> source(String::cast(script->source()), isolate);
+   std::unique_ptr<Utf16CharacterStream> stream(
+       ScannerStream::For(isolate, source, shared_info->StartPosition(),
+diff --git a/deps/v8/src/snapshot/code-serializer.cc b/deps/v8/src/snapshot/code-serializer.cc
+index ec69ad51239..18940323442 100644
+--- a/deps/v8/src/snapshot/code-serializer.cc
++++ b/deps/v8/src/snapshot/code-serializer.cc
+@@ -703,10 +703,6 @@ SerializedCodeSanityCheckResult SerializedCodeData::SanityCheck(
+ 
+ SerializedCodeSanityCheckResult SerializedCodeData::SanityCheckJustSource(
+     uint32_t expected_source_hash) const {
+-  uint32_t source_hash = GetHeaderValue(kSourceHashOffset);
+-  if (source_hash != expected_source_hash) {
+-    return SerializedCodeSanityCheckResult::kSourceMismatch;
+-  }
+   return SerializedCodeSanityCheckResult::kSuccess;
+ }
+ 
+@@ -723,10 +719,6 @@ SerializedCodeSanityCheckResult SerializedCodeData::SanityCheckWithoutSource(
+   if (version_hash != Version::Hash()) {
+     return SerializedCodeSanityCheckResult::kVersionMismatch;
+   }
+-  uint32_t flags_hash = GetHeaderValue(kFlagHashOffset);
+-  if (flags_hash != FlagList::Hash()) {
+-    return SerializedCodeSanityCheckResult::kFlagsMismatch;
+-  }
+   uint32_t ro_snapshot_checksum =
+       GetHeaderValue(kReadOnlySnapshotChecksumOffset);
+   if (ro_snapshot_checksum != expected_ro_snapshot_checksum) {
+diff --git a/lib/child_process.js b/lib/child_process.js
+index 655349b6fa1..77092e0cd5b 100644
+--- a/lib/child_process.js
++++ b/lib/child_process.js
+@@ -171,7 +171,7 @@ function fork(modulePath, args = [], options) {
+     throw new ERR_CHILD_PROCESS_IPC_REQUIRED('options.stdio');
+   }
+ 
+-  return spawn(options.execPath, args, options);
++  return module.exports.spawn(options.execPath, args, options);
+ }
+ 
+ function _forkChild(fd, serializationMode) {
+diff --git a/lib/internal/bootstrap/pkg.js b/lib/internal/bootstrap/pkg.js
+new file mode 100644
+index 00000000000..50deb0b3cd9
+--- /dev/null
++++ b/lib/internal/bootstrap/pkg.js
+@@ -0,0 +1,64 @@
++'use strict';
++
++const {
++  prepareWorkerThreadExecution,
++  prepareMainThreadExecution
++} = require('internal/process/pre_execution');
++
++if (internalBinding('worker').isMainThread) {
++  prepareMainThreadExecution(true);
++} else {
++  prepareWorkerThreadExecution();
++}
++
++(function () {
++  var __require__ = require;
++  var fs = __require__('fs');
++  var vm = __require__('vm');
++  function readPrelude (fd) {
++    var PAYLOAD_POSITION = '// PAYLOAD_POSITION //' | 0;
++    var PAYLOAD_SIZE = '// PAYLOAD_SIZE //' | 0;
++    var PRELUDE_POSITION = '// PRELUDE_POSITION //' | 0;
++    var PRELUDE_SIZE = '// PRELUDE_SIZE //' | 0;
++    if (!PRELUDE_POSITION) {
++      // no prelude - remove entrypoint from argv[1]
++      process.argv.splice(1, 1);
++      return { undoPatch: true };
++    }
++    var fileSize = fs.fstatSync(fd).size;
++    var prelude = Buffer.alloc(PRELUDE_SIZE);
++    var windowSize = 32768;
++    var windowShift = 24576;
++    var window = Buffer.alloc(windowSize);
++    var windowOffset = fileSize;
++    var preludeIdx = -1;
++    while (preludeIdx === -1 && windowOffset > 0) {
++       windowOffset = Math.max(windowOffset - windowShift, 0);
++       fs.readSync(fd, window, {position: windowOffset, length: windowSize});
++       preludeIdx = window.indexOf("(function(process, require, console, EXECPATH_FD, PAYLOAD_POSITION, PAYLOAD_SIZE) {");
++    }
++    if (preludeIdx !== -1) {
++       PRELUDE_POSITION = windowOffset + preludeIdx;
++       PAYLOAD_POSITION = PRELUDE_POSITION - PAYLOAD_SIZE;
++    }
++    var read = fs.readSync(fd, prelude, 0, PRELUDE_SIZE, PRELUDE_POSITION);
++    if (read !== PRELUDE_SIZE) {
++      console.error('Pkg: Error reading from file.');
++      process.exit(1);
++    }
++    var s = new vm.Script(prelude, { filename: 'pkg/prelude/bootstrap.js' });
++    var fn = s.runInThisContext();
++    return fn(process, __require__,
++      console, fd, PAYLOAD_POSITION, PAYLOAD_SIZE);
++  }
++  (function () {
++    var fd = fs.openSync(process.execPath, 'r');
++    var result = readPrelude(fd);
++    if (result && result.undoPatch) {
++      var bindingFs = process.binding('fs');
++      fs.internalModuleStat = bindingFs.internalModuleStat;
++      fs.internalModuleReadJSON = bindingFs.internalModuleReadJSON;
++      fs.closeSync(fd);
++    }
++  }());
++}());
+diff --git a/lib/internal/modules/cjs/loader.js b/lib/internal/modules/cjs/loader.js
+index 9b51e5bf4cd..172a7af0dbc 100644
+--- a/lib/internal/modules/cjs/loader.js
++++ b/lib/internal/modules/cjs/loader.js
+@@ -250,12 +250,16 @@ function stat(filename) {
+   // Guard against internal bugs where a non-string filename is passed in by mistake.
+   assert(typeof filename === 'string');
+ 
++  const origFilename = filename;
+   filename = path.toNamespacedPath(filename);
+   if (statCache !== null) {
+     const result = statCache.get(filename);
+     if (result !== undefined) { return result; }
+   }
+-  const result = internalFsBinding.internalModuleStat(filename);
++  const fs = require('fs');
++  const result = fs.existsSync(origFilename) ?
++    (fs.statSync(origFilename).isDirectory() ? 1 : 0) : -1;
++
+   if (statCache !== null && result >= 0) {
+     // Only set cache when `internalModuleStat(filename)` succeeds.
+     statCache.set(filename, result);
+diff --git a/lib/internal/modules/package_json_reader.js b/lib/internal/modules/package_json_reader.js
+index 47b248c2ae6..0f0a5ceb9e6 100644
+--- a/lib/internal/modules/package_json_reader.js
++++ b/lib/internal/modules/package_json_reader.js
+@@ -105,17 +105,20 @@ const requiresJSONParse = (value) => (value !== undefined && (value[0] === '[' |
+  * @returns {PackageConfig}
+  */
+ function read(jsonPath, { base, specifier, isESM } = kEmptyObject) {
+-  // This function will be called by both CJS and ESM, so we need to make sure
+-  // non-null attributes are converted to strings.
+-  const parsed = modulesBinding.readPackageJSON(
+-    jsonPath,
+-    isESM,
+-    base == null ? undefined : `${base}`,
+-    specifier == null ? undefined : `${specifier}`,
+-  );
+-
+-  const result = deserializePackageJSON(jsonPath, parsed);
+-
++  const fs = require('fs');
++  let result;
++  if (fs.existsSync(jsonPath)) {
++    const json = JSONParse(fs.readFileSync(jsonPath, { encoding: "utf8" }).trim());
++    result = deserializePackageJSON(jsonPath, [
++      json['name'],
++      json['main'],
++      json['type'],
++      json['imports'],
++      json['exports'],
++    ]);
++  } else {
++    result = deserializePackageJSON(jsonPath, undefined);
++  }
+   return {
+     __proto__: null,
+     ...result.data,
+diff --git a/lib/internal/process/pre_execution.js b/lib/internal/process/pre_execution.js
+index 0cda54fd85e..ce27ac878ff 100644
+--- a/lib/internal/process/pre_execution.js
++++ b/lib/internal/process/pre_execution.js
+@@ -50,7 +50,11 @@ const {
+   runDeserializeCallbacks,
+ } = require('internal/v8/startup_snapshot');
+ 
++let _alreadyPrepared = false;
++
+ function prepareMainThreadExecution(expandArgv1 = false, initializeModules = true) {
++  if (_alreadyPrepared === true) return;
++  _alreadyPrepared = true;
+   return prepareExecution({
+     expandArgv1,
+     initializeModules,
+@@ -243,7 +247,8 @@ function patchProcessObject(expandArgv1) {
+   let mainEntry;
+   // If requested, update process.argv[1] to replace whatever the user provided with the resolved absolute file path of
+   // the entry point.
+-  if (expandArgv1 && process.argv[1] && process.argv[1][0] !== '-') {
++  if (expandArgv1 && process.argv[1] && process.argv[1][0] !== '-' &&
++    process.argv[1] !== 'PKG_DUMMY_ENTRYPOINT') {
+     // Expand process.argv[1] into a full path.
+     const path = require('path');
+     try {
+@@ -728,6 +733,7 @@ function loadPreloadModules() {
+   // For user code, we preload modules if `-r` is passed
+   const preloadModules = getOptionValue('--require');
+   if (preloadModules && preloadModules.length > 0) {
++    assert(false, '--require is not supported');
+     const {
+       Module: {
+         _preloadModules,
+diff --git a/lib/vm.js b/lib/vm.js
+index ae710806201..b05638de759 100644
+--- a/lib/vm.js
++++ b/lib/vm.js
+@@ -98,6 +98,7 @@ class Script extends ContextifyScript {
+       produceCachedData = false,
+       importModuleDynamically,
+       [kParsingContext]: parsingContext,
++      sourceless = false,
+     } = options;
+ 
+     validateString(filename, 'options.filename');
+@@ -121,7 +122,8 @@ class Script extends ContextifyScript {
+             cachedData,
+             produceCachedData,
+             parsingContext,
+-            hostDefinedOptionId);
++            hostDefinedOptionId,
++            sourceless);
+     } catch (e) {
+       throw e; /* node-do-not-add-exception-line */
+     }
+diff --git a/src/inspector_agent.cc b/src/inspector_agent.cc
+index fa6eb29e6e5..5d6dd23f6a6 100644
+--- a/src/inspector_agent.cc
++++ b/src/inspector_agent.cc
+@@ -819,11 +819,6 @@ bool Agent::Start(const std::string& path,
+                               StartIoThreadAsyncCallback));
+     uv_unref(reinterpret_cast<uv_handle_t*>(&start_io_thread_async));
+     start_io_thread_async.data = this;
+-    if (parent_env_->should_start_debug_signal_handler()) {
+-      // Ignore failure, SIGUSR1 won't work, but that should not block node
+-      // start.
+-      StartDebugSignalHandler();
+-    }
+ 
+     parent_env_->AddCleanupHook([](void* data) {
+       Environment* env = static_cast<Environment*>(data);
+diff --git a/src/node.cc b/src/node.cc
+index c0d0b734edf..58583892f9a 100644
+--- a/src/node.cc
++++ b/src/node.cc
+@@ -404,6 +404,8 @@ MaybeLocal<Value> StartExecution(Environment* env, StartExecutionCallback cb) {
+     return env->RunSnapshotDeserializeMain();
+   }
+ 
++  StartExecution(env, "internal/bootstrap/pkg");
++
+   if (env->worker_context() != nullptr) {
+     return StartExecution(env, "internal/main/worker_thread");
+   }
+@@ -628,14 +630,6 @@ static void PlatformInit(ProcessInitializationFlags::Flags flags) {
+   }
+ 
+   if (!(flags & ProcessInitializationFlags::kNoDefaultSignalHandling)) {
+-#if HAVE_INSPECTOR
+-    sigset_t sigmask;
+-    sigemptyset(&sigmask);
+-    sigaddset(&sigmask, SIGUSR1);
+-    const int err = pthread_sigmask(SIG_SETMASK, &sigmask, nullptr);
+-    CHECK_EQ(err, 0);
+-#endif  // HAVE_INSPECTOR
+-
+     ResetSignalHandlers();
+   }
+ 
+diff --git a/src/node_contextify.cc b/src/node_contextify.cc
+index 386102dfe7e..fa452538bf1 100644
+--- a/src/node_contextify.cc
++++ b/src/node_contextify.cc
+@@ -86,6 +86,7 @@ using v8::Symbol;
+ using v8::Uint32;
+ using v8::UnboundScript;
+ using v8::Value;
++using v8::V8;
+ 
+ // The vm module executes code in a sandboxed environment with a different
+ // global object than the rest of the code. This is achieved by applying
+@@ -993,13 +994,13 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
+   Local<ArrayBufferView> cached_data_buf;
+   bool produce_cached_data = false;
+   Local<Context> parsing_context = context;
+-
++  bool sourceless = false;
+   Local<Symbol> id_symbol;
+   if (argc > 2) {
+     // new ContextifyScript(code, filename, lineOffset, columnOffset,
+     //                      cachedData, produceCachedData, parsingContext,
+-    //                      hostDefinedOptionId)
+-    CHECK_EQ(argc, 8);
++    //                      hostDefinedOptionId, sourceless)
++    CHECK_GE(argc, 8);
+     CHECK(args[2]->IsNumber());
+     line_offset = args[2].As<Int32>()->Value();
+     CHECK(args[3]->IsNumber());
+@@ -1020,6 +1021,10 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
+     }
+     CHECK(args[7]->IsSymbol());
+     id_symbol = args[7].As<Symbol>();
++    if (argc > 8) {
++      CHECK(args[8]->IsBoolean());
++      sourceless = args[8]->IsTrue();
++    }
+   }
+ 
+   ContextifyScript* contextify_script =
+@@ -1067,6 +1072,10 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
+   ShouldNotAbortOnUncaughtScope no_abort_scope(env);
+   Context::Scope scope(parsing_context);
+ 
++  if (sourceless && produce_cached_data) {
++    V8::EnableCompilationForSourcelessUse();
++  }
++
+   MaybeLocal<UnboundScript> maybe_v8_script =
+       ScriptCompiler::CompileUnboundScript(isolate, &source, compile_options);
+ 
+@@ -1081,6 +1090,12 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
+     return;
+   }
+ 
++  if (sourceless && compile_options == ScriptCompiler::kConsumeCodeCache) {
++    if (!source.GetCachedData()->rejected) {
++      V8::FixSourcelessScript(env->isolate(), v8_script);
++    }
++  }
++
+   contextify_script->script_.Reset(isolate, v8_script);
+   contextify_script->script_.SetWeak();
+   contextify_script->object()->SetInternalField(kUnboundScriptSlot, v8_script);
+@@ -1120,6 +1135,10 @@ void ContextifyScript::New(const FunctionCallbackInfo<Value>& args) {
+           .IsNothing())
+     return;
+ 
++  if (sourceless && produce_cached_data) {
++    V8::DisableCompilationForSourcelessUse();
++  }
++
+   TRACE_EVENT_END0(TRACING_CATEGORY_NODE2(vm, script), "ContextifyScript::New");
+ }
+ 
+diff --git a/src/node_main.cc b/src/node_main.cc
+index f66099a5570..4048f6bd937 100644
+--- a/src/node_main.cc
++++ b/src/node_main.cc
+@@ -22,6 +22,8 @@
+ #include "node.h"
+ #include <cstdio>
+ 
++int reorder(int argc, char** argv);
++
+ #ifdef _WIN32
+ #include <windows.h>
+ #include <VersionHelpers.h>
+@@ -88,12 +90,95 @@ int wmain(int argc, wchar_t* wargv[]) {
+   }
+   argv[argc] = nullptr;
+   // Now that conversion is done, we can finally start.
+-  return node::Start(argc, argv);
++  return reorder(argc, argv);
+ }
+ #else
+ // UNIX
+ 
+ int main(int argc, char* argv[]) {
++  return reorder(argc, argv);
++}
++#endif
++
++#include <string.h>
++
++int strlen2 (char* s) {
++  int len = 0;
++  while (*s) {
++    len += 1;
++    s += 1;
++  }
++  return len;
++}
++
++bool should_set_dummy() {
++#ifdef _WIN32
++  #define MAX_ENV_LENGTH 32767
++  wchar_t execpath_env[MAX_ENV_LENGTH];
++  DWORD result = GetEnvironmentVariableW(L"PKG_EXECPATH", execpath_env, MAX_ENV_LENGTH);
++  if (result == 0 && GetLastError() != ERROR_SUCCESS) return true;
++  return wcscmp(execpath_env, L"PKG_INVOKE_NODEJS") != 0;
++#else
++  const char* execpath_env = getenv("PKG_EXECPATH");
++  if (!execpath_env) return true;
++  return strcmp(execpath_env, "PKG_INVOKE_NODEJS") != 0;
++#endif
++}
++
++// for uv_setup_args
++int adjacent(int argc, char** argv) {
++  size_t size = 0;
++  for (int i = 0; i < argc; i++) {
++    size += strlen(argv[i]) + 1;
++  }
++  char* args = new char[size];
++  size_t pos = 0;
++  for (int i = 0; i < argc; i++) {
++    memcpy(&args[pos], argv[i], strlen(argv[i]) + 1);
++    argv[i] = &args[pos];
++    pos += strlen(argv[i]) + 1;
++  }
+   return node::Start(argc, argv);
+ }
++
++volatile char* BAKERY = (volatile char*) "\0// BAKERY // BAKERY " \
++  "// BAKERY // BAKERY // BAKERY // BAKERY // BAKERY // BAKERY " \
++  "// BAKERY // BAKERY // BAKERY // BAKERY // BAKERY // BAKERY " \
++  "// BAKERY // BAKERY // BAKERY // BAKERY // BAKERY // BAKERY ";
++
++#ifdef __clang__
++__attribute__((optnone))
++#elif defined(__GNUC__)
++__attribute__((optimize(0)))
+ #endif
++
++int load_baked(char** nargv) {
++  int c = 1;
++
++  char* bakery = (char*) BAKERY;
++  while (true) {
++    size_t width = strlen2(bakery);
++    if (width == 0) break;
++    nargv[c++] = bakery;
++    bakery += width + 1;
++  }
++
++  return c;
++}
++
++int reorder(int argc, char** argv) {
++  char** nargv = new char*[argc + 64];
++
++  nargv[0] = argv[0];
++  int c = load_baked(nargv);
++
++  if (should_set_dummy()) {
++    nargv[c++] = (char*) "PKG_DUMMY_ENTRYPOINT";
++  }
++
++  for (int i = 1; i < argc; i++) {
++    nargv[c++] = argv[i];
++  }
++
++  return adjacent(c, nargv);
++}
+diff --git a/src/node_options.cc b/src/node_options.cc
+index 228fbe64558..21704192025 100644
+--- a/src/node_options.cc
++++ b/src/node_options.cc
+@@ -319,6 +319,7 @@ void Parse(
+ // TODO(addaleax): Make that unnecessary.
+ 
+ DebugOptionsParser::DebugOptionsParser() {
++  return;
+ #ifndef DISABLE_SINGLE_EXECUTABLE_APPLICATION
+   if (sea::IsSingleExecutable()) return;
+ #endif
+diff --git a/tools/icu/icu-generic.gyp b/tools/icu/icu-generic.gyp
+index f007c65232c..002a00a6aee 100644
+--- a/tools/icu/icu-generic.gyp
++++ b/tools/icu/icu-generic.gyp
+@@ -52,7 +52,7 @@
+         'conditions': [
+           [ 'os_posix == 1 and OS != "mac" and OS != "ios"', {
+             'cflags': [ '-Wno-deprecated-declarations', '-Wno-strict-aliasing' ],
+-            'cflags_cc': [ '-frtti' ],
++            'cflags_cc': [ '-frtti', '-fno-lto' ],
+             'cflags_cc!': [ '-fno-rtti' ],
+           }],
+           [ 'OS == "mac" or OS == "ios"', {
