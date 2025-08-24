@@ -3,6 +3,7 @@ import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 
+import {minify} from "terser";
 import { hash, spawn } from './utils';
 import { hostArch, hostPlatform } from './system';
 import { log } from './log';
@@ -68,6 +69,10 @@ function getConfigureArgs(major: number, targetPlatform: string): string[] {
   // New node v22
   args.push('--without-amaro');
   args.push('--without-sqlite');
+  
+  args.push('--experimental-enable-pointer-compression');
+  args.push('--v8-disable-object-print');
+  args.push('--v8-enable-snapshot-compression'); // see https://github.com/nodejs/node/commit/a996638e53c82a7c60589f88c6d7b517e9fd5505
 
 
   // Workaround for nodejs/node#39313
@@ -202,8 +207,8 @@ async function compileOnUnix(
   }
 
   const { CFLAGS = '', CXXFLAGS = '' } = process.env;
-  process.env.CFLAGS = `${CFLAGS} -Os`;
-  process.env.CXXFLAGS = `${CXXFLAGS} -Os`;
+  process.env.CFLAGS = `${CFLAGS} -Os -ffunction-sections -fdata-sections -flto`;
+  process.env.CXXFLAGS = `${CXXFLAGS} -Os -ffunction-sections -fdata-sections -flto`;
 
   if (targetArch === 'armv7') {
     process.env.CFLAGS = `${process.env.CFLAGS} -marm -mcpu=cortex-a7 -mfpu=vfpv3`;
@@ -255,6 +260,140 @@ async function compileOnUnix(
   return output;
 }
 
+async function findJsFiles(dir: string): Promise<string[]> {
+    const results: string[] = [];
+    const list = await fs.readdir(dir);
+    for (const file of list) {
+        const filePath = path.join(dir, file);
+        const stat = await fs.stat(filePath);
+        if (stat && stat.isDirectory()) {
+            results.push(...(await findJsFiles(filePath)));
+        } else if (filePath.endsWith('.js')) {
+            results.push(filePath);
+        }
+    }
+    return results;
+}
+
+function formatBytes(bytes: number, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    // eslint-disable-next-line no-restricted-properties
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))  } ${  sizes[i]}`;
+}
+
+async function minifyInternalJS() {
+    log.info('Minifying internal JavaScript sources with Terser...');
+
+    const targets = [
+        {
+            path: path.join('deps', 'undici', 'src'),
+            terserOptions: { mangle: true, compress: true },
+        },
+        {
+            path: path.join('deps', 'acorn', 'acorn', 'dist'),
+            terserOptions: { mangle: true, compress: true },
+        },
+        {
+            path: path.join('deps', 'minimatch'),
+            terserOptions: { mangle: true, compress: true },
+        },
+        /*
+        {
+            path: path.join('lib'),
+            // CRITICAL: For Node's core library, we use a much safer config.
+            // We disable mangling and property compression to avoid breaking internals.
+            terserOptions: {
+                mangle: false,
+                compress: {
+                    properties: false,
+                },
+            },
+        }, */
+    ];
+
+    let totalSizeBefore = 0;
+    let totalSizeAfter = 0;
+
+    for (const target of targets) {
+        const targetPath = path.join(nodePath, target.path);
+        if (!(await fs.pathExists(targetPath))) {
+            log.warn(`Path not found, skipping minification for: ${target.path}`);
+            continue;
+        }
+
+        const jsFiles = await findJsFiles(targetPath);
+        if (jsFiles.length === 0) continue;
+
+        const statsBefore = await Promise.all(jsFiles.map(file => fs.stat(file)));
+        const sizeBefore = statsBefore.reduce((sum, stat) => sum + stat.size, 0);
+        totalSizeBefore += sizeBefore;
+
+        const minifyPromises = jsFiles.map(async (file) => {
+            try {
+                const code = await fs.readFile(file, 'utf8');
+                // Apply the specific options for this target
+                const result = await minify(code, target.terserOptions);
+                if (result.code) {
+                    await fs.writeFile(file, result.code, 'utf8');
+                }
+            } catch (err) {
+                log.error(`Failed to minify ${file}:`, err);
+                throw err;
+            }
+        });
+        await Promise.all(minifyPromises);
+
+        const statsAfter = await Promise.all(jsFiles.map(file => fs.stat(file)));
+        const sizeAfter = statsAfter.reduce((sum, stat) => sum + stat.size, 0);
+        totalSizeAfter += sizeAfter;
+
+        log.info(`Minified ${target.path}: ${formatBytes(sizeBefore)} -> ${formatBytes(sizeAfter)}`);
+    }
+
+    // Log the final summary report
+    if (totalSizeBefore > 0) {
+        const reduction = ((totalSizeBefore - totalSizeAfter) / totalSizeBefore) * 100;
+        log.info(
+            `Total minification complete. ` +
+            `Before: ${formatBytes(totalSizeBefore)}, ` +
+            `After: ${formatBytes(totalSizeAfter)} ` +
+            `(Reduced by ${reduction.toFixed(1)}%)`
+        );
+    }
+}
+
+async function nullWasmFiles() {
+    log.info('Nulling wasm files');
+
+    const wasmFilesToNeuter = [
+        'deps/cjs-module-lexer/src/lib/lexer.wasm',
+        'deps/undici/src/lib/llhttp/llhttp.wasm',
+        'deps/undici/src/lib/llhttp/llhttp_simd.wasm',
+    ];
+    
+    const nullByte = Buffer.from([0]);
+
+    for (const relativePath of wasmFilesToNeuter) {
+        const fullPath = path.join(nodePath, relativePath);
+        if (await fs.pathExists(fullPath)) {
+            try {
+                await fs.writeFile(fullPath, nullByte);
+                log.info(`Overwrote: ${relativePath}`);
+            } catch (err) {
+                log.error(`Failed to overwrite ${relativePath}:`, err);
+                throw err;
+            }
+        }
+    }
+}
+
+
+
+
 async function compile(
   nodeVersion: string,
   targetArch: string,
@@ -282,6 +421,9 @@ export default async function build(
   await gitClone(nodeVersion);
   await gitResetHard(nodeVersion);
   await applyPatches(nodeVersion);
+
+  await nullWasmFiles();
+  await minifyInternalJS();
 
   const output = await compile(nodeVersion, targetArch, targetPlatform);
   const outputHash = await hash(output);
